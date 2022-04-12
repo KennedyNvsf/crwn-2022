@@ -1,7 +1,8 @@
 
-import React,{useState} from "react";
+import React,{useState, useContext} from "react";
+import {UserContext} from "../../contexts/user.context";
 import "./sign-up-form.styles.scss";//styling
-import {createUserDocWithEmailAndPassword, createUserDocFromAuth} from "../../utils/firebase/firebase.utils";//firebase utils
+import {createUserAuthWithEmailAndPassword, createUserDocFromAuth} from "../../utils/firebase/firebase.utils";//firebase utils
 //components
 import FormIput from "../form-input/forn-input.component";
 import Button from "../../components/button/button.component";
@@ -18,8 +19,9 @@ const SignUpForm = () => {
 
     const [formFields, setFormFields] = useState(defaultFormFields);
     const {displayName, email, password, confirmPassword} = formFields;
-    console.log(formFields);
-    
+    const {setCurrentUser} = useContext(UserContext);
+    console.log('hit');
+
    const resetFormFields = () => {
        setFormFields(defaultFormFields);
    }
@@ -42,17 +44,19 @@ const SignUpForm = () => {
 
         try {
 
-            const {user} = await createUserDocWithEmailAndPassword(email, password);
-            await createUserDocFromAuth(user, {displayName});
+            const {user} = await createUserAuthWithEmailAndPassword(email, password);
+            alert('success');
+            await createUserDocFromAuth(user,  {displayName});
+            setCurrentUser(user)
             resetFormFields();
+           
             
         } catch (error) {
 
             if(error.code === 'auth/email-already-in-use'){
-
-                alert('Email already in use');
-
-            } else {console.log('Encountered Error creating the User', error);}
+                alert('Email already Exists')
+            } else {console.log('Encountered Error creating the User', error);
+        }
             
             
         }
@@ -78,7 +82,7 @@ const SignUpForm = () => {
     
                 <FormIput label="Confirm Password" type="password" required onChange={handleChange} name="confirmPassword" value={confirmPassword} />
 
-                <Button  type="submit">Sign Up</Button>
+                <Button type="submit">Sign Up</Button>
             </form>
 
         </div>

@@ -1,5 +1,6 @@
 
-import React,{useState} from "react";
+import React,{useState, useContext} from "react";
+import { UserContext } from "../../contexts/user.context";
 import "./sign-in-form.styles.scss";//styling
 import {createUserDocFromAuth, signInWithGooglePopup, signInUserWithEmailAndPassword} from "../../utils/firebase/firebase.utils";//firebase utils
 //components
@@ -17,6 +18,8 @@ const SignInForm = () => {
 
     const [formFields, setFormFields] = useState(defaultFormFields);
     const { email, password} = formFields;
+
+    const {setCurrentUser} = useContext(UserContext);
 
    const resetFormFields = () => {
        setFormFields(defaultFormFields);
@@ -39,15 +42,27 @@ const SignInForm = () => {
         event.preventDefault();
 
         try {
-            const response = await signInUserWithEmailAndPassword(email, password);
-            console.log(response)
+            const {user} = await signInUserWithEmailAndPassword(email, password);
+            setCurrentUser(user)
             resetFormFields();
             
         } catch (error) {
-             if(error.code === 'auth/wrong-password') {
-                 alert('incorrect password for email')
-             }
-            console.log(error);
+
+            switch(error.code){
+
+                case 'auth/wrong-password':
+                    alert('Incorrect Password');
+                    break
+
+                case 'auth/user-not-found':
+                    alert('User not found');
+                    break
+
+                default: 
+                console.log(error); 
+
+            }
+
         }
     }
    
@@ -67,7 +82,7 @@ const SignInForm = () => {
 
                 <div className="buttons-container">
                     <Button type="submit">Sign In</Button>
-                    <Button buttonType="google" onClick={signInWithGoogle}>Google Sign In</Button>
+                    <Button type="button" buttonType="google" onClick={signInWithGoogle}>Google Sign In</Button>
                 </div>
                 
             </form>
