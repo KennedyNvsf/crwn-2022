@@ -40,11 +40,14 @@ const SignInForm = () => {
 
         try {
             const response = await signInUserWithEmailAndPassword(email, password);
+            console.log(response)
             resetFormFields();
             
         } catch (error) {
-
-             
+             if(error.code === 'auth/wrong-password') {
+                 alert('incorrect password for email')
+             }
+            console.log(error);
         }
     }
    

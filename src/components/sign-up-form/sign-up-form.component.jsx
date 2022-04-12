@@ -18,6 +18,8 @@ const SignUpForm = () => {
 
     const [formFields, setFormFields] = useState(defaultFormFields);
     const {displayName, email, password, confirmPassword} = formFields;
+    console.log(formFields);
+    
    const resetFormFields = () => {
        setFormFields(defaultFormFields);
    }
@@ -41,7 +43,7 @@ const SignUpForm = () => {
         try {
 
             const {user} = await createUserDocWithEmailAndPassword(email, password);
-            await createUserDocFromAuth(user, {displayName})
+            await createUserDocFromAuth(user, {displayName});
             resetFormFields();
             
         } catch (error) {
@@ -76,7 +78,7 @@ const SignUpForm = () => {
     
                 <FormIput label="Confirm Password" type="password" required onChange={handleChange} name="confirmPassword" value={confirmPassword} />
 
-                <Button buttonType='' type="submit">Sign Up</Button>
+                <Button  type="submit">Sign Up</Button>
             </form>
 
         </div>
