@@ -1,3 +1,4 @@
+ import { async } from '@firebase/util';
 import {initializeApp} from 'firebase/app';
 import {
   getAuth,
@@ -9,7 +10,7 @@ import {
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
-import {getFirestore, doc, getDoc, setDoc} from 'firebase/firestore';
+import {getFirestore, doc, getDoc, setDoc, collection, writeBatch} from 'firebase/firestore';
 
   const firebaseConfig = {
       apiKey: "AIzaSyCCXJnQEdY9MS5OUewOvJ8n8EuPM9eYYnU",
@@ -33,6 +34,19 @@ import {getFirestore, doc, getDoc, setDoc} from 'firebase/firestore';
   export const signInWithGoogleRedirect = () => signInWithRedirect(auth, GoogleProvider)
 
   export const db = getFirestore();
+
+  export const addCollectionAndDocuments =  async (collectionLabel, objectsToAdd) => {
+    const collectionRef = collection(db, collectionLabel);
+    const batch = writeBatch(db);
+
+    objectsToAdd.forEach((object) => {
+       const docRef = doc(collectionRef, object.title.toLowerCase());
+       batch.set(docRef, object);
+    })
+
+    await batch.commit();
+    console.log('Done');
+  };
 
   //storing user in the db collections
   export const createUserDocFromAuth = async (
